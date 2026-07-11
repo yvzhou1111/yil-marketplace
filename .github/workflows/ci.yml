@@ -94,7 +94,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run db:generate
+      # Migrations are committed under db/migrations/ (both hand-authored
+      # and drizzle-kit-generated) so we don't regenerate in CI.
       - run: npm run db:migrate
       - run: npm run db:seed
       - run: npm run build
@@ -109,4 +110,4 @@ jobs:
           done
           echo "App did not become healthy in time"; exit 1
       - name: Smoke check homepage
-        run: curl -fsS http://127.0.0.1:3000/ -o /tmp/home.html && grep -q "Hello, marketplace!" /tmp/home.html
+        run: curl -fsS http://127.0.0.1:3000/ -o /tmp/home.html && grep -q "YIL Marketplace" /tmp/home.html
