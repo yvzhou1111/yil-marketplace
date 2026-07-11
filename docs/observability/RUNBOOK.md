@@ -252,7 +252,7 @@ psql "$DATABASE_URL" -c "
 ### Mitigate
 
 1. **Missing index** (someone dropped it in a migration). Restore from
-   `db/migrations/0001_search_index.sql`; redeploy.
+   `db/migrations/0002_search_index.sql`; redeploy.
 2. **Index bloat**. Run `VACUUM ANALYZE listings` (does not lock).
 3. **Search returns 0 for valid queries**. Inspect `SearchQuery.ts` — the
    `to_tsquery` call may be quoting user input incorrectly. Rollback the last
