@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: yil-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: yil_marketplace
+      POSTGRES_USER: yil
+      POSTGRES_PASSWORD: yil
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yil -d yil_marketplace"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    container_name: yil-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://yil:yil@postgres:5432/yil_marketplace
+      NODE_ENV: production
+      PORT: "3000"
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres-data:
