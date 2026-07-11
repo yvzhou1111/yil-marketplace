@@ -46,7 +46,7 @@
  *
  * Order state machine (YIL-14):
  *   See docs/architecture/transactions.md and
- *   docs/adr/0002-order-state-machine.md. The `order_state` enum is the
+ *   docs/adr/0003-order-state-machine.md. The `order_state` enum is the
  *   single source of truth for legal states; the
  *   `orders_status_transition_allowed` CHECK constraint on
  *   `order_state_transitions` enforces legal (from_state, to_state) pairs in
