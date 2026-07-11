@@ -29,20 +29,11 @@ async function main() {
   }
   const pool = new Pool({ connectionString: url });
 
-  // 1. Hand-authored bootstrap SQL — apply every *.sql that lives directly
-  //    under db/migrations (excluding generated/ subdirectory).
+  // 1. Drizzle-generated migrations (if any have been produced) — applied
+  //    FIRST so the core tables (`listings`, `users`, …) exist before the
+  //    hand-authored migrations reference them. See db/migrations/0002_search_index.sql
+  //    comment for the rationale.
   const migrationsDir = resolve(process.cwd(), "db/migrations");
-  const handFiles = readdirSync(migrationsDir)
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
-
-  for (const file of handFiles) {
-    console.log(`Applying hand-authored migration ${file}…`);
-    const sql = readFileSync(resolve(migrationsDir, file), "utf8");
-    await pool.query(sql);
-  }
-
-  // 2. Drizzle-generated migrations (if any have been produced).
   const generatedDir = resolve(migrationsDir, "generated");
   try {
     const stat = readdirSync(generatedDir);
@@ -54,6 +45,18 @@ async function main() {
   } catch (err) {
     // generated/ may not exist yet — that's fine, drizzle-kit creates it.
     if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+  }
+
+  // 2. Hand-authored bootstrap SQL — apply every *.sql that lives directly
+  //    under db/migrations (excluding generated/ subdirectory).
+  const handFiles = readdirSync(migrationsDir)
+    .filter((f) => f.endsWith(".sql"))
+    .sort();
+
+  for (const file of handFiles) {
+    console.log(`Applying hand-authored migration ${file}…`);
+    const sql = readFileSync(resolve(migrationsDir, file), "utf8");
+    await pool.query(sql);
   }
 
   console.log("Migrations complete.");
