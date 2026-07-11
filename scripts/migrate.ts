@@ -29,6 +29,13 @@ async function main() {
   }
   const pool = new Pool({ connectionString: url });
 
+  // 0. Required extensions. These are applied inline (not via a migration
+  //    file) so they exist before any migration — including the
+  //    drizzle-kit-generated one — references them. pg_trgm in particular
+  //    is needed for `gin_trgm_ops` GIN indexes in 0000_initial_core_schema.sql.
+  await pool.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto;`);
+  await pool.query(`CREATE EXTENSION IF NOT EXISTS pg_trgm;`);
+
   // 1. Drizzle-generated migrations (if any have been produced) — applied
   //    FIRST so the core tables (`listings`, `users`, …) exist before the
   //    hand-authored migrations reference them. See db/migrations/0002_search_index.sql
