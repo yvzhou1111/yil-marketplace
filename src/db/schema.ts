@@ -265,7 +265,12 @@ export const listings = pgTable(
     // YIL-8 — Postgres full-text search vector. Generated from title (weight A)
     // and description (weight B). Maintained by Postgres; the app never writes
     // to it. Indexes are declared in the table builder below.
-    searchVector: tsvector("search_vector"),
+    searchVector: tsvector("search_vector").generatedAlwaysAs(
+      sql`(
+        setweight(to_tsvector('english', coalesce(title, '')),       'A') ||
+        setweight(to_tsvector('english', coalesce(description, '')), 'B')
+      )`
+    ),
   },
   (t) => ({
     sellerIdx: index("listings_seller_idx").on(t.sellerId),
