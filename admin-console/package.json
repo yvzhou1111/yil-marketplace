@@ -1,0 +1,27 @@
+{
+  "name": "yil-admin-console",
+  "version": "0.1.0",
+  "private": true,
+  "description": "YIL-11 Week 4.1 minimal admin console: listing moderation, user lookup, metrics dashboard.",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "next lint",
+    "db:init": "psql \"$DATABASE_URL\" -f sql/schema.sql",
+    "db:reset": "psql \"$DATABASE_URL\" -c 'drop schema if exists admin cascade; drop table if exists public.listings cascade; drop table if exists public.users cascade;' -f sql/schema.sql"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "pg": "8.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.10",
+    "@types/pg": "8.11.6",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "typescript": "5.5.3"
+  }
+}
