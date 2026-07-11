@@ -20,7 +20,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
       - run: npm run lint
 
   typecheck:
@@ -32,7 +35,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
       - run: npm run typecheck
 
   test:
@@ -44,7 +50,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
       - run: npm test
 
   build:
@@ -57,7 +66,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
       - run: npm run build
       - uses: actions/upload-artifact@v4
         with:
@@ -93,7 +105,10 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
       # Migrations are committed under db/migrations/ (both hand-authored
       # and drizzle-kit-generated) so we don't regenerate in CI.
       - run: npm run db:migrate
