@@ -1,0 +1,21 @@
+node_modules/
+.next/
+out/
+build/
+dist/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+.vscode/
+.idea/
+coverage/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+# Drizzle migration metadata — keeps generated SQL reproducible from
+# `src/db/schema.ts`; commit only the SQL.
+drizzle/meta/
+# Local Postgres data dir if someone uses `initdb` for tests
+pgdata/

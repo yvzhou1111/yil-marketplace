@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
+      - run: npm run lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
+      - run: npm run typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
+      - run: npm test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: .next/
+          retention-days: 7
+
+  preview:
+    name: Preview (Docker smoke test)
+    runs-on: ubuntu-latest
+    needs: [build]
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: yil_marketplace
+          POSTGRES_USER: yil
+          POSTGRES_PASSWORD: yil
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U yil -d yil_marketplace"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://yil:yil@localhost:5432/yil_marketplace
+      NODE_ENV: production
+      GITHUB_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --include=dev
+      # NOTE: --include=dev is belt-and-braces. NODE_ENV=production can cause
+      # some npm versions to drop devDependencies; we explicitly opt in so
+      # tsx, drizzle-kit, and the rest of the dev tooling are available.
+      # Migrations are committed under db/migrations/ (both hand-authored
+      # and drizzle-kit-generated) so we don't regenerate in CI.
+      - run: npm run db:migrate
+      # db:seed is owned by YIL-5 and references the full schema; it's a
+      # no-op for the YIL-3 preview smoke (we only need to prove the app
+      # boots and /api/health returns 200). Run it locally; skip in CI.
+      - run: npm run build
+      - run: npm start &
+      - name: Wait for app
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/api/health; then
+              echo "Health endpoint OK"; exit 0
+            fi
+            sleep 2
+          done
+          echo "App did not become healthy in time"; exit 1
+      - name: Smoke check homepage
+        run: curl -fsS http://127.0.0.1:3000/ -o /tmp/home.html && grep -q "YIL Marketplace" /tmp/home.html
