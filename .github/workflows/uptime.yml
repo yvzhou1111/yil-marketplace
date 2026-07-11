@@ -1,0 +1,61 @@
+name: Uptime probe
+
+# Runs every 5 minutes from GitHub-hosted runners. Acts as a second probe
+# alongside the external SaaS monitor. A 5xx here means our SaaS monitor is
+# either missing an outage or also down — both are worth knowing.
+#
+# History of runs in the Actions tab is the audit log of uptime that does
+# not require a paid uptime SaaS.
+#
+# Required secrets:
+#   UPTIME_URL — full URL to probe (e.g. https://marketplace.example.com/api/ready)
+#   UPTIME_ALERT_EMAIL — address to notify on failure (the founder)
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  probe:
+    name: Probe /api/ready
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Probe readiness endpoint
+        env:
+          URL: ${{ secrets.UPTIME_URL }}
+        run: |
+          if [ -z "$URL" ]; then
+            echo "::error::UPTIME_URL secret is not set"
+            exit 1
+          fi
+          # 30s timeout; capture body and status.
+          body=$(mktemp)
+          status=$(curl -sS -o "$body" -w "%{http_code}" \
+            --max-time 30 \
+            -H "User-Agent: yil-uptime-probe/1.0" \
+            "$URL")
+          echo "Status: $status"
+          echo "Body:"
+          cat "$body"
+          if [ "$status" -ge 500 ] || [ "$status" -lt 200 ] || [ "$status" -eq 000 ]; then
+            echo "::error::readiness probe failed with status $status"
+            exit 1
+          fi
+          # 200 is healthy; 503 means the service is degraded but reachable.
+          # We fail the run on 503 too — better to over-alert than miss.
+          if [ "$status" -ne 200 ]; then
+            echo "::warning::readiness probe returned $status (not 200)"
+            exit 1
+          fi
+
+      - name: Email on failure
+        if: failure()
+        env:
+          EMAIL: ${{ secrets.UPTIME_ALERT_EMAIL }}
+        run: |
+          if [ -n "$EMAIL" ]; then
+            echo "Workflow run: ${{ github.run_id }}" \
+              | mail -s "[yil-marketplace] uptime probe failed" "$EMAIL" || true
+          fi
