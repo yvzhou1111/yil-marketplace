@@ -1,0 +1,281 @@
+/* YIL-7 — Detail page styles */
+
+.page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 24px 64px;
+}
+
+.crumbs {
+  margin-bottom: 16px;
+}
+
+.crumbLink {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.crumbLink:hover {
+  color: var(--accent);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ----- Gallery ----- */
+
+.gallerySection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.hero {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+}
+
+.heroImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--bg);
+  display: block;
+}
+
+.heroPlaceholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.1em;
+}
+
+.heroPlaceholderText {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.thumbs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+}
+
+.thumbWrap {
+  display: block;
+}
+
+.thumb {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: var(--bg);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ----- Info panel ----- */
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tagList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.title {
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 700;
+  margin: 0;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 4px;
+  color: var(--fg);
+}
+
+.meta {
+  font-size: 14px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.metaItem {
+  white-space: nowrap;
+}
+
+/* ----- Contact CTA ----- */
+
+.cta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: center;
+  transition: background 80ms ease-out;
+}
+
+.cta:hover {
+  background: #1d4fd1;
+}
+
+.ctaPrimary {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ctaSub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ----- Description ----- */
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0;
+}
+
+.descriptionBody {
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+/* ----- Seller card ----- */
+
+.sellerCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.sellerAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bg);
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sellerAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sellerInitials {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.sellerBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sellerName {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.sellerMeta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.disclaimer {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.disclaimer code {
+  font-family: "SF Mono", Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+}
